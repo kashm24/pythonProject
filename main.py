@@ -169,7 +169,7 @@ def Clear(event): #очистка полей
     textBoxToDate.delete(0, END)
 
 
-def SaveDocx(event, scale_widget=None):  # Функция для сохранения результатов в docx
+def SaveDocx(event):  # Функция для сохранения результатов в docx
   if labelLowOut['text'] == "" and labelMidOut['text'] == "" and labelHighOut['text'] == "" and labelCritOut['text'] == "":
       messagebox.showerror('Ошибка',
                            'Для вывода отчёта в документ необходимо провести анализ')
@@ -196,30 +196,30 @@ def SaveDocx(event, scale_widget=None):  # Функция для сохране�
         hdr_cells3[1].text = 'Критический'
         hdr_cells3[2].text = str(labelCritOut['text'])
         document.save('Анализ уязвимостей ' + combo.get() + '.docx')
-      else:
-        my_wb = openpyxl.Workbook()
-        my_sheet = my_wb.active
-        c1 = my_sheet.cell(row=1, column=1)
-        c1.value = "Угроза"
-        c3 = my_sheet.cell(row=2, column=1)
-        c3.value = 'Низкая'
-        c4 = my_sheet.cell(row=3, column=1)
-        c4.value = 'Средняя'
-        c5 = my_sheet.cell(row=4, column=1)
-        c5.value = 'Высокая'
-        c6 = my_sheet.cell(row=5, column=1)
-        c6.value = 'Критическая'
-        c2 = my_sheet.cell(row=1, column=2)
-        c2.value = "Количество угроз"
-        c7 = my_sheet.cell(row=5, column=2)
-        c7.value = labelCritOut['text']
-        c8 = my_sheet.cell(row=2, column=2)
-        c8.value = labelLowOut['text']
-        c9 = my_sheet.cell(row=3, column=2)
-        c9.value = labelMidOut['text']
-        c10 = my_sheet.cell(row=4, column=2)
-        c10.value = labelHighOut['text']
-        my_wb.save('Анализ уязвимостей ' + combo.get() + '.xlsx')
+      #else:
+       # my_wb = openpyxl.Workbook()
+       # my_sheet = my_wb.active
+       # c1 = my_sheet.cell(row=1, column=1)
+       # c1.value = "Угроза"
+       # c3 = my_sheet.cell(row=2, column=1)
+       # c3.value = 'Низкая'
+       # c4 = my_sheet.cell(row=3, column=1)
+       # c4.value = 'Средняя'
+       # c5 = my_sheet.cell(row=4, column=1)
+       # c5.value = 'Высокая'
+       # c6 = my_sheet.cell(row=5, column=1)
+       # c6.value = 'Критическая'
+       # c2 = my_sheet.cell(row=1, column=2)
+       # c2.value = "Количество угроз"
+       # c7 = my_sheet.cell(row=5, column=2)
+       # c7.value = labelCritOut['text']
+       # c8 = my_sheet.cell(row=2, column=2)
+       # c8.value = labelLowOut['text']
+       # c9 = my_sheet.cell(row=3, column=2)
+       # c9.value = labelMidOut['text']
+       # c10 = my_sheet.cell(row=4, column=2)
+       # c10.value = labelHighOut['text']
+       # my_wb.save('Анализ уязвимостей ' + combo.get() + '.xlsx')
 
 def example1(event):
     def print_sel():
@@ -347,8 +347,8 @@ labelDateInfo.pack()
 
 labelToInfo = Label(okno, bg='#78b6f0', fg='black', width=20)
 
-#scale_widget = Scale(master=okno, from_=Word, to=Excel, orient="horizontal")
-#scale_widget.place(x=750, y=420)
+scale_widget = Scale(master=okno, from_=0, to=1, orient="horizontal")
+scale_widget.place(x=750, y=420)
 #(x=750, y=515)
 
 #label0 = Label(okno, text="Word")
