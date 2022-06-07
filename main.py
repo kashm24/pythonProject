@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from tkcalendar import Calendar
 
+
 def donloade(event):
     try:
         files = open('vullist.xlsx', "wb")
@@ -40,9 +41,9 @@ def dateOff(event):  #Без даты
     labelFromDate.configure(state=DISABLED)
     labelToDate.configure(state=DISABLED)
 def AnalysysWithDate(event):  # Функция для проверки правильности ввода даты
-    chrb = radioButtonDateVar.get()  # Заносим в переменную chrb состояние радиокнопок (1 или 0)
-    if chrb == 0:  # Если радиокнопка "По дате" включена (1)
-        Analysys(event)  # Выполняем функцию Analysys
+    chrb = radioButtonDateVar.get()  # состояние кнопок, 0 -за все время, 1 - по дате
+    if chrb == 0:
+        Analysys(event)
     else:
         dataFrom = textBoxFromDate.get()
         dataTo = textBoxToDate.get()
@@ -55,35 +56,30 @@ def AnalysysWithDate(event):  # Функция для проверки прав�
             Analysys(event)
           else:
             messagebox.showerror('Ошибка',
-                                 'Некорректно введена дата')  # Если дата введена некорректно - выводим окно с ошибкой
+                                 'Некорректно введена дата')
         else:
           messagebox.showerror('Ошибка',
-                               'Некорректно введена дата')  # Если дата введена некорректно - выводим окно с ошибкой
-
+                               'Некорректно введена дата')
 
 def Analysys(event):  # Функция поиска уязвимостей
-
     try:
         try:
-            workbook = xlrd2.open_workbook('vullist.xlsx')  # открываем книгу xlsx
-
-            sheet = workbook.sheet_by_index(0)  # получаем доступ к первой странице книги (нумерация страниц с 0)
-
-            row = sheet.nrows  # определяем количество записей (строк) на листе
+            workbook = xlrd2.open_workbook('vullist.xlsx')
+            sheet = workbook.sheet_by_index(0)  #получаем доступ к первой странице
+            row = sheet.nrows  # определяем количество записей
             if row != 0:
                 names = sheet.col_values(4)
                 status = sheet.col_values(14)
-
                 danger_lavels = sheet.col_values(12)
                 chrb = radioButtonDateVar.get()
                 ddd = sheet.col_values(9)
                 DDD = var1.get()
                 sow=combo.get()
-                global danger_low, danger_middle, danger_hight, danger_super
-                danger_super, danger_hight, danger_middle, danger_low = 0, 0, 0, 0
-                if chrb == 0: # Если радиокнопка "По дате" выключена (0)
-                    dataFrom = datetime.strptime('01.01.1900',"%d.%m.%Y")
-                    dataTo = datetime.strptime('17.06.3021', "%d.%m.%Y")
+                global danger_low, danger_middle, danger_hight, danger_crit
+                danger_crit, danger_hight, danger_middle, danger_low = 0, 0, 0, 0
+                if chrb == 0:
+                    dataFrom = datetime.strptime('01.01.2001',"%d.%m.%Y")
+                    dataTo = datetime.strptime('17.06.2023', "%d.%m.%Y")
                 else:
                     dataFrom = datetime.strptime(textBoxFromDate.get(), "%d.%m.%Y")
                     dataTo = datetime.strptime(textBoxToDate.get(), "%d.%m.%Y")
@@ -92,13 +88,13 @@ def Analysys(event):  # Функция поиска уязвимостей
                     if ddd[i] != '':
                         ddd[i] = datetime.strptime(ddd[i], "%d.%m.%Y")
                     else:
-                        ddd[i] = datetime.strptime('01.01.1999', "%d.%m.%Y")
+                        ddd[i] = datetime.strptime('01.01.2001', "%d.%m.%Y")
                 for i in range(4, row):
                     if (str(ddd[i]) >= str(dataFrom)) and (str(ddd[i]) <= str(dataTo)):
                         if DDD == 1:
                             if status[i].find("Потенциальная уязвимость") >= 0 and names[i].find(sow) >= 0:
                                 if danger_lavels[i][0] == 'К':  # Критический
-                                    danger_super += 1
+                                    danger_crit += 1
 
                                 elif danger_lavels[i][0] == 'В':  # Высокий
                                     danger_hight += 1
@@ -112,7 +108,7 @@ def Analysys(event):  # Функция поиска уязвимостей
                             if names[i].find(sow) >= 0:
 
                               if danger_lavels[i][0] == 'К':  # Критический
-                                danger_super += 1
+                                danger_crit += 1
 
                               elif danger_lavels[i][0] == 'В':  # Высокий
                                 danger_hight += 1
@@ -126,58 +122,57 @@ def Analysys(event):  # Функция поиска уязвимостей
                 labelLowOut['text'] = danger_low
                 labelMidOut['text'] = danger_middle
                 labelHighOut['text'] = danger_hight
-                labelSuperOut['text'] = danger_super
-            else:
+                labelCritOut['text'] = danger_crit
+            else:  # сообщения об ошибке с базой
                 messagebox.showerror('Ошибка',
-                                     'Для анализа необходимо обновить базу уязвимостей!')
+                                     'Для анализа необходимо обновить базу')
         except FileNotFoundError:
             messagebox.showerror('Ошибка',
-                                 'Для анализа необходимо загрузить (Обновить) базу уязвимостей!')
+                                 'Для анализа необходимо загрузить (Обновить) базу')
     except xlrd2.biffh.XLRDError:
         messagebox.showerror('Ошибка',
-                             'Для анализа необходимо загрузить (Обновить) базу уязвимостей!')
+                             'Для анализа необходимо загрузить (Обновить) базу')
 
 def diagramma(event):
     try:
-        if danger_low == 0 and danger_middle == 0 and danger_hight == 0 and danger_super ==0:
+        if danger_low == 0 and danger_middle == 0 and danger_hight == 0 and danger_crit ==0:
             messagebox.showerror('Ошибка',
-                                 'Для вывода диаграммы необходимо хотя бы одно значение отличное от 0!')
+                                 'Для вывода диаграммы необходимо хоть одно не равное 0')
         else:
             labels = 'Низкий', 'Средний', 'Высокий', 'Критический'
-            sizes = [danger_low, danger_middle, danger_hight, danger_super]
-
-            colors = ("grey", "yellow", "orange",
-            "red")
-            fig1, ax1 = plt.subplots()
+            sizes = [danger_low, danger_middle, danger_hight, danger_crit]
+            colors = ("#c0c0c0", "#fff44f", "#FFAF18",
+            "#E52E2A")
+            figure, ax1 = plt.subplots()
             explode = (0, 0.1, 0, 0)
 
-            ax1.pie(sizes, wedgeprops=dict(width=1), colors=colors, explode=explode, labels=labels,autopct='%1.1f%%', shadow=True, startangle=90)
-            patches, texts, auto = ax1.pie(sizes, wedgeprops=dict(width=1), colors=colors, shadow=True, startangle=90, explode=explode, autopct='%1.1f%%' )
+            ax1.pie(sizes, wedgeprops=dict(width=1), colors=colors, explode=explode, labels=labels,autopct='%1.1f%%', startangle=90)
+            patches, texts, auto = ax1.pie(sizes, wedgeprops=dict(width=1), colors=colors, startangle=90, explode=explode, autopct='%1.1f%%' )
+            plt.legend(patches, labels, loc='best', bbox_to_anchor=(0.7, 0.67, 0.5, 0.5)) # расположение легенды в диаграмме
 
-            plt.legend(patches, labels, loc="best")
             okno=Tk()
-            okno.title("Диаграмма уязвимостей")
-            okno.configure(background='#a8e4a0')
-            canvas = FigureCanvasTkAgg(fig1, master=okno)
+            okno.title("Диаграмма")
+            okno.configure(background='#082567')
+            canvas = FigureCanvasTkAgg(figure, master=okno)
             canvas.get_tk_widget().pack()
             canvas.draw()
     except NameError:
         messagebox.showerror('Ошибка',
-                             'Для вывода диаграммы необходимо провести анализ!')
+                             'Для вывода диаграммы необходимо провести анализ')
 
 def Clear(event): #очистка полей
     labelLowOut['text'] = ""
     labelMidOut['text'] = ""
     labelHighOut['text'] = ""
-    labelSuperOut['text'] = ""
+    labelCritOut['text'] = ""
     textBoxFromDate.delete(0, END)
     textBoxToDate.delete(0, END)
 
 
-def SaveDocx(event):  # Функция для сохранения результатов в docx
-  if labelLowOut['text'] == "" and labelMidOut['text'] == "" and labelHighOut['text'] == "" and labelSuperOut['text'] == "":
+def SaveDocx(event, scale_widget=None):  # Функция для сохранения результатов в docx
+  if labelLowOut['text'] == "" and labelMidOut['text'] == "" and labelHighOut['text'] == "" and labelCritOut['text'] == "":
       messagebox.showerror('Ошибка',
-                           'Для вывода отчёта в документ необходимо провести анализ!')
+                           'Для вывода отчёта в документ необходимо провести анализ')
   else:
       if scale_widget.get() == 0:
         document = docx.Document()
@@ -199,7 +194,7 @@ def SaveDocx(event):  # Функция для сохранения резуль�
         hdr_cells3 = table.rows[3].cells
         hdr_cells3[0].text = '4'
         hdr_cells3[1].text = 'Критический'
-        hdr_cells3[2].text = str(labelSuperOut['text'])
+        hdr_cells3[2].text = str(labelCritOut['text'])
         document.save('Анализ уязвимостей ' + combo.get() + '.docx')
       else:
         my_wb = openpyxl.Workbook()
@@ -217,7 +212,7 @@ def SaveDocx(event):  # Функция для сохранения резуль�
         c2 = my_sheet.cell(row=1, column=2)
         c2.value = "Количество угроз"
         c7 = my_sheet.cell(row=5, column=2)
-        c7.value = labelSuperOut['text']
+        c7.value = labelCritOut['text']
         c8 = my_sheet.cell(row=2, column=2)
         c8.value = labelLowOut['text']
         c9 = my_sheet.cell(row=3, column=2)
@@ -235,13 +230,11 @@ def example1(event):
         okno.update()
 
     top = tk.Toplevel(okno)
-
     cal = Calendar(top,
                    font="Arial 14", selectmode='day',
                    cursor="hand1", year=2018, month=2, day=5)
     cal.pack(fill="both", expand=True)
     ttk.Button(top, text="ok", command=print_sel).pack()
-
 def example2(event):
     def print_sel():
         textBoxToDate.delete(0, END)
@@ -250,15 +243,12 @@ def example2(event):
         textBoxToDate.insert(0, data)
         okno.update()
 
-
     top = tk.Toplevel(okno)
-
     cal = Calendar(top,
                    font="Arial 14", selectmode='day',
                    cursor="hand1", year=2018, month=2, day=5)
     cal.pack(fill="both", expand=True)
     ttk.Button(top, text="ok", command=print_sel).pack()
-
 okno = Tk() # Главное меню
 okno.resizable(False, False)
 okno.title("Анализ уязвимости")  # Название окна
@@ -283,11 +273,11 @@ labelHigh.place(x=0, y=220)
 labelHighOut = Label(okno, bg='#99ffcc', font='Times 15', fg='black', width=5)
 labelHighOut.place(x=0, y=265)
 
-labelSuper = Label(okno, width=13, height=2, bg='#f22c39', font='Times 13', text="Критический")
-labelSuper.place(x=0, y=295)
+labelCrit = Label(okno, width=13, height=2, bg='#f22c39', font='Times 13', text="Критический")
+labelCrit.place(x=0, y=295)
 
-labelSuperOut = Label(okno, bg='#99ffcc', font='Times 15', fg='black', width=5)
-labelSuperOut.place(x=0, y=340)
+labelCritOut = Label(okno, bg='#99ffcc', font='Times 15', fg='black', width=5)
+labelCritOut.place(x=0, y=340)
 
 radioButtonDateVar = BooleanVar()  #кнопоки
 radioButtonDateVar.set(0)
@@ -315,12 +305,13 @@ c1.grid(column=0, row=0)
 c1.place(x=210, y=60)
 
 buttonobnow = Button(okno, bg='#027ef2', font='Times 12', text="Обновить базу", width=13, height=2)
-buttonobnow.bind('<Button-1>', donloade)
+buttonobnow.bind('<Button-1>', donloade )
+buttonobnow.bind('<Button-1>', AnalysysWithDate )
 buttonobnow.place(x=300, y=515)
 
-buttonAnalysis = Button(okno, bg='#027ef2', font='Times 12', text="Анализ базы", width=13, height=2)
-buttonAnalysis.place(x=450, y=515)
-buttonAnalysis.bind('<Button-1>', AnalysysWithDate)
+#buttonAnalysis = Button(okno, bg='#027ef2', font='Times 12', text="Анализ базы", width=13, height=2)
+#buttonAnalysis.place(x=450, y=515)
+#buttonAnalysis.bind('<Button-1>', AnalysysWithDate)
 
 buttonClear = Button(okno, bg='#027ef2', font='Times 12', text="Удалить", width=13, height=2)
 buttonClear.place(x=600, y=515)
@@ -360,9 +351,9 @@ labelToInfo = Label(okno, bg='#78b6f0', fg='black', width=20)
 #scale_widget.place(x=750, y=420)
 #(x=750, y=515)
 
-label0 = Label(okno, text="Word")
-label0.place(x=750, y=405)
+#label0 = Label(okno, text="Word")
+#label0.place(x=750, y=405)
 
-label1 = Label(okno, text="Excel")
-label1.place(x=820, y=405)
+#label1 = Label(okno, text="Excel")
+#label1.place(x=820, y=405)
 okno.mainloop()
