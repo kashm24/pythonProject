@@ -8,6 +8,7 @@ import requests
 import docx
 from tkinter.ttk import Combobox
 import matplotlib.pyplot as plt
+from docx import document
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from tkcalendar import Calendar
 
@@ -171,26 +172,32 @@ def SaveDocx(event):  # Функция для сохранения резуль�
       messagebox.showerror('Ошибка',
                            'Для вывода отчёта в документ необходимо провести анализ')
   else: #иначе создать файл ворд
-        document = docx.Document() # создания ворда
-        document.add_heading(combo.get(), 0)
+
+        document = docx.Document()
+        document.add_heading(combo.get(), 1)
         document.add_heading('Количество уязвимостей по уровням опасности', level=1)
-        table = document.add_table(rows=4, cols=3)
-        hdr_cells = table.rows[0].cells
-        hdr_cells[0].text = '1'
-        hdr_cells[1].text = 'Низкий'
-        hdr_cells[2].text = str(labelLowOut['text'])
-        hdr_cells1 = table.rows[1].cells
-        hdr_cells1[0].text = '2'
-        hdr_cells1[1].text = 'Средний'
-        hdr_cells1[2].text = str(labelMidOut['text'])
-        hdr_cells2 = table.rows[2].cells
-        hdr_cells2[0].text = '3'
-        hdr_cells2[1].text = 'Высокий'
-        hdr_cells2[2].text = str(labelHighOut['text'])
-        hdr_cells3 = table.rows[3].cells
-        hdr_cells3[0].text = '4'
-        hdr_cells3[1].text = 'Критический'
-        hdr_cells3[2].text = str(labelCritOut['text'])
+        table = document.add_table(rows=5, cols=2)
+
+        nazvcell = table.rows[0].cells
+        nazvcell[0].text = 'Уровень'
+        nazvcell[1].text = 'Количество'
+
+        cellforlow = table.rows[1].cells
+        cellforlow[0].text = 'Низкий'
+        cellforlow[1].text = str(labelLowOut['text'])
+
+        cellformid = table.rows[2].cells
+        cellformid[0].text = 'Средний'
+        cellformid[1].text = str(labelMidOut['text'])
+
+        cellsforhigh = table.rows[3].cells
+        cellsforhigh[0].text = 'Высокий'
+        cellsforhigh[1].text = str(labelHighOut['text'])
+
+        cellsforcrit = table.rows[4].cells
+        cellsforcrit[0].text = 'Критический'
+        cellsforcrit[1].text = str(labelHighOut['text'])
+
         document.save('Анализ уязвимостей ' + combo.get() + '.docx') #название файла
 
 def OT_date(event):
