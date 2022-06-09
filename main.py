@@ -172,31 +172,30 @@ def SaveDocx(event):  # Функция для сохранения резуль�
       messagebox.showerror('Ошибка',
                            'Для вывода отчёта в документ необходимо провести анализ')
   else: #иначе создать файл ворд
-
         document = docx.Document()
-        document.add_heading(combo.get(), 1)
-        document.add_heading('Количество уязвимостей по уровням опасности', level=1)
-        table = document.add_table(rows=5, cols=2)
+        document.add_heading(combo.get(), 1) #берем слово по которому искали и добовляем его в заголовок
+        document.add_heading('Количество уязвимостей по уровням опасности', 1) # название таблицы
+        table = document.add_table(rows=5, cols=2) #размеры таблицы
 
-        nazvcell = table.rows[0].cells
-        nazvcell[0].text = 'Уровень'
-        nazvcell[1].text = 'Количество'
+        nazvcell = table.rows[0].cells # ячейка названия
+        nazvcell[0].text = 'Уровень' # 1 столбец название
+        nazvcell[1].text = 'Количество' # 2 столбец название
 
-        cellforlow = table.rows[1].cells
-        cellforlow[0].text = 'Низкий'
-        cellforlow[1].text = str(labelLowOut['text'])
+        cellforlow = table.rows[1].cells # ячейка для данных Низкий
+        cellforlow[0].text = 'Низкий' # 1 столбец название
+        cellforlow[1].text = str(labelLowOut['text']) # 2 столбец количество
 
-        cellformid = table.rows[2].cells
-        cellformid[0].text = 'Средний'
-        cellformid[1].text = str(labelMidOut['text'])
+        cellformid = table.rows[2].cells #ячейка для данных Средний
+        cellformid[0].text = 'Средний' # 1 столбец название
+        cellformid[1].text = str(labelMidOut['text']) # 2 столбец количество
 
-        cellsforhigh = table.rows[3].cells
-        cellsforhigh[0].text = 'Высокий'
-        cellsforhigh[1].text = str(labelHighOut['text'])
+        cellsforhigh = table.rows[3].cells #ячейка для данных Высокий
+        cellsforhigh[0].text = 'Высокий' # 1 столбец название
+        cellsforhigh[1].text = str(labelHighOut['text']) # 2 столбец количество
 
-        cellsforcrit = table.rows[4].cells
-        cellsforcrit[0].text = 'Критический'
-        cellsforcrit[1].text = str(labelHighOut['text'])
+        cellsforcrit = table.rows[4].cells #ячейка для данных Критический
+        cellsforcrit[0].text = 'Критический' # 1 столбец название
+        cellsforcrit[1].text = str(labelHighOut['text']) # 2 столбец количество
 
         document.save('Анализ уязвимостей ' + combo.get() + '.docx') #название файла
 
